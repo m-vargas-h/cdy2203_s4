@@ -1,0 +1,43 @@
+package com.duoc.backend;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+// Clase que implementa UserDetailsService para cargar los detalles del usuario desde la base de datos
+@Configuration
+@Service
+public class MyUserDetailsService implements UserDetailsService {
+
+        Logger logger
+        = LoggerFactory.getLogger(MyUserDetailsService.class);
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // Método para cargar los detalles del usuario por su nombre de usuario
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException(username);
+        }
+        return user;
+    }
+
+    // Bean para el codificador de contraseñas utilizando BCrypt
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+    }
+}
